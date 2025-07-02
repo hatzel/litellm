@@ -116,10 +116,11 @@ def batch_completion(
         # results = [future.result() for future in completions]
         # return exceptions if any
         results = []
-        pbar = tqdm.tqdm(desc="Processing prompts", total=len(messages))
+        pbar = tqdm.tqdm(desc="Processing requests", total=len(completions))
         import concurrent.futures
         for future in concurrent.futures.as_completed(completions):
             pbar.update(1)
+        for future in completions:
             try:
                 results.append(future.result())
             except Exception as exc:
