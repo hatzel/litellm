@@ -6,6 +6,7 @@ from litellm._logging import print_verbose
 from litellm.utils import get_optional_params
 
 from ..llms.vllm.completion import handler as vllm_handler
+import tqdm
 
 
 def batch_completion(
@@ -115,11 +116,15 @@ def batch_completion(
         # results = [future.result() for future in completions]
         # return exceptions if any
         results = []
-        for future in completions:
+        pbar = tqdm.tqdm(desc="Processing prompts", total=len(messages))
+        import concurrent.futures
+        for future in concurrent.futures.as_completed(completions):
+            pbar.update(1)
             try:
                 results.append(future.result())
             except Exception as exc:
                 results.append(exc)
+        pbar.close()
 
     return results
 
